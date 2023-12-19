@@ -7,9 +7,6 @@ import {
   Validators,
 } from '@angular/forms';
 
-// TODO: move so it becomes global
-const API_URL = 'http://localhost:3000';
-
 @Component({
   selector: 'new-book-form',
   standalone: true,
@@ -37,39 +34,40 @@ export class NewBookFormComponent {
     description: new FormControl(''),
   });
 
-  async onSubmit() {
-    const bookId = uuidv4();
-    fetch(API_URL + '/books', {
-      method: 'POST',
-      body: JSON.stringify({
-        title: this.bookForm.value.title,
-        author: this.bookForm.value.author,
-        image: this.bookForm.value.image,
-        id: bookId,
-      }),
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
-    })
-      .then((response) => {
-        if (response.status === 201) {
-          return fetch(API_URL + '/descriptions', {
-            method: 'POST',
-            body: JSON.stringify({
-              id: bookId,
-              bookId,
-              description: this.bookForm.value.description,
-            }),
-            headers: {
-              'Content-type': 'application/json; charset=UTF-8',
-            },
-          });
-        }
-        return null;
-      })
-      .catch((error) => console.log(error));
-    // TODO: add finally for alert
-  }
+  // async onSubmit() {
+  //   const bookId = uuidv4();
+  //   fetch(API_URL + '/books', {
+  //     method: 'POST',
+  //     body: JSON.stringify({
+  //       title: this.bookForm.value.title,
+  //       author: this.bookForm.value.author,
+  //       image: this.bookForm.value.image,
+  //       id: bookId,
+  //     }),
+  //     headers: {
+  //       'Content-type': 'application/json; charset=UTF-8',
+  //     },
+  //   })
+  //     .then((response) => {
+  //       if (response.status === 201) {
+  //         return fetch(API_URL + '/descriptions', {
+  //           method: 'POST',
+  //           body: JSON.stringify({
+  //             id: bookId,
+  //             bookId,
+  //             description: this.bookForm.value.description,
+  //           }),
+  //           headers: {
+  //             'Content-type': 'application/json; charset=UTF-8',
+  //           },
+  //         });
+  //       }
+  //       return null;
+  //     })
+  //     .catch((error) => console.log(error));
+  //   // TODO: add finally for alert
+  // }
+  onSubmit() {}
 
   onFileSelect(e: any) {
     const file = e.target.files[0],
