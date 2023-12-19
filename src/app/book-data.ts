@@ -3,4 +3,5 @@ export interface BookData {
   author: string;
   cover: string;
   isbn: string;
+  id: string;
 }

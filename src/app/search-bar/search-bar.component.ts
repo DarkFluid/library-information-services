@@ -1,28 +1,59 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import {
-  FormGroup,
-  FormControl,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-const API_URL = 'http://localhost:3000/books';
+import {Component, EventEmitter, Output} from '@angular/core';
+import {FormGroup, FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatRadioModule} from '@angular/material/radio';
+import {MatButtonModule} from '@angular/material/button';
+import {API_URL} from '../book.service';
 
 @Component({
   selector: 'search-bar',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatRadioModule,
+    MatButtonModule,
+  ],
   template: `
-    <form [formGroup]="searchForm" (ngSubmit)="onSubmit()">
-      <input type="text" formControlName="searchValue" />
-      <input type="radio" formControlName="searchBy" value="title" /> Title
-      <input type="radio" formControlName="searchBy" value="author" /> Author
-      <button type="submit" [disabled]="!searchForm.valid">Search</button>
+    <form [formGroup]="searchForm" (ngSubmit)="onSubmit()" class="search-form">
+      <mat-form-field class="search-field">
+        <mat-label>Search the library</mat-label>
+        <input matInput formControlName="searchValue" placeholder="Hans..." value="" />
+      </mat-form-field>
+
+      <mat-radio-group formControlName="searchBy" aria-label="Select an option">
+        <mat-radio-button value="title">Title</mat-radio-button>
+        <mat-radio-button value="author">Author</mat-radio-button>
+      </mat-radio-group>
+      <!-- The disabled check is so we don't get an error when the field is empty/cleared -->
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="!(searchForm.value.searchValue!.length > 0)"
+      >
+        Search
+      </button>
+      @if (this.searchUrl) {
+      <button mat-button (click)="clearSearch()">Clear Search</button>
+      }
     </form>
-    @if (this.searchUrl) {
-    <button (click)="clearSearch()">Clear Search</button>
-    }
   `,
-  styles: ``,
+  styles: `
+  .search-form {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+    width: 75%;
+    align-items: baseline;
+    gap: 10px;
+    margin: 30px auto;
+    .search-field {
+      width: 60%;
+    }
+  }`,
 })
 export class SearchBarComponent {
   searchUrl = '';
@@ -31,17 +62,14 @@ export class SearchBarComponent {
     searchBy: 'title',
   };
   searchForm = new FormGroup({
-    searchValue: new FormControl(
-      this.initialValues.searchValue,
-      Validators.compose([Validators.required, Validators.maxLength(100)])
-    ),
+    searchValue: new FormControl(this.initialValues.searchValue, Validators.maxLength(100)),
     searchBy: new FormControl(this.initialValues.searchBy, Validators.required),
   });
 
   @Output() searchQuery = new EventEmitter<string>();
 
   onSubmit() {
-    this.searchUrl = `${API_URL}?${this.searchForm.value.searchBy}_like=${this.searchForm.value.searchValue}`;
+    this.searchUrl = `${API_URL}/books?${this.searchForm.value.searchBy}_like=${this.searchForm.value.searchValue}`;
     this.searchQuery.emit(this.searchUrl);
   }
 
